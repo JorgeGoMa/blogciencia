@@ -1,5 +1,6 @@
 <?php  include('../config.php'); ?>
 	<?php include(ROOT_PATH . '/admin/includes/admin_functions.php'); ?>
+	<?php  include(ROOT_PATH . '/admin/includes/topics_functions.php'); ?>
 	<?php include(ROOT_PATH . '/admin/includes/header.php'); ?>
 	<title>Admin | Muro</title>
 </head>

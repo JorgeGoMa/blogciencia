@@ -1,6 +1,7 @@
 <?php  include('../config.php'); ?>
 <?php  include(ROOT_PATH . '/admin/includes/admin_functions.php'); ?>
 <?php  include(ROOT_PATH . '/admin/includes/topics_functions.php'); ?>
+<?php  include(ROOT_PATH . '/admin/includes/post_functions.php'); ?>
 <?php include(ROOT_PATH . '/admin/includes/header.php'); ?>
 <!-- Get all topics from DB -->
 <?php $topics = getAllTopics();	?>

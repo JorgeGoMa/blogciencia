@@ -1,5 +1,5 @@
 <?php 
-	// declaración de variable
+	// declaración de variables
 	$username = "";
 	$email    = "";
 	$errors = array(); 

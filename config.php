@@ -1,7 +1,7 @@
 <?php 
 	session_start();
 
-    // conección a la Base de Datos
+    // conexión a la Base de Datos
     $conn = mysqli_connect("localhost", "root", "", "blogciencia");
 
 	if (!$conn) {

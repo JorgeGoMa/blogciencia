@@ -12,15 +12,15 @@ $user_id = $_SESSION['user']['id'];
 
 
 /* - - - - - - - - - - 
--  Post functions
+-  Funciones
 - - - - - - - - - - -*/
-// get all posts from DB
+// obtener todas las publicaciones de DB
 function getAllPosts()
 {
 	global $conn;
 	
-	// Admin can view all posts
-	// Author can only view their posts
+	// El administrador puede ver todas las publicaciones
+	// El autor solo puede ver sus publicaciones
 	if ($_SESSION['user']['role'] == "Admin") {
 		$sql = "SELECT * FROM posts";
 	} elseif ($_SESSION['user']['role'] == "Autor") {
@@ -37,7 +37,7 @@ function getAllPosts()
 	}
 	return $final_posts;
 }
-// get the author/username of a post
+// Obtener el autor / nombre de usuario de una publicación.
 function getPostAuthorById($user_id)
 {
 	global $conn;
@@ -52,28 +52,28 @@ function getPostAuthorById($user_id)
 }
 
 /* - - - - - - - - - - 
--  Post actions
+-  Acciones
 - - - - - - - - - - -*/
-// if user clicks the create post button
+// si el usuario hace clic en el botón crear publicación
 if (isset($_POST['create_post'])) { createPost($_POST); }
-// if user clicks the Edit post button
+// si el usuario hace clic en el botón Editar publicación
 if (isset($_GET['edit-post'])) {
 	$isEditingPost = true;
 	$post_id = $_GET['edit-post'];
 	editPost($post_id);
 }
-// if user clicks the update post button
+// si el usuario hace clic en el botón de publicación de actualización
 if (isset($_POST['update_post'])) {
 	updatePost($_POST);
 }
-// if user clicks the Delete post button
+// si el usuario hace clic en el botón Eliminar publicación
 if (isset($_GET['delete-post'])) {
 	$post_id = $_GET['delete-post'];
 	deletePost($post_id);
 }
 
 /* - - - - - - - - - - 
--  Post functions
+-  Funciones
 - - - - - - - - - - -*/
 function createPost($request_values)
 	{
@@ -86,28 +86,28 @@ function createPost($request_values)
 		if (isset($request_values['publish'])) {
 			$published = esc($request_values['publish']);
 		}
-		// create slug: if title is "The Storm Is Over", return "the-storm-is-over" as slug
+		// crear babosa: si el título es "La tormenta ha terminado", devuelve "la-tormenta-terminó"
 		$post_slug = makeSlug($title);
 		// validate form
 		if (empty($title)) { array_push($errors, "Título del artículo"); }
 		if (empty($body)) { array_push($errors, "Cuerpo del artículo"); }
 		if (empty($topic_id)) { array_push($errors, "Tema del artículo"); }
-		// Get image name
+		// Obtener el nombre de la imagen
 	  	$featured_image = $_FILES['featured_image']['name'];
 	  	if (empty($featured_image)) { array_push($errors, "Falta imagen"); }
-	  	// image file directory
+	  	// directorio de archivos de imagen
 	  	$target = "../static/images/" . basename($featured_image);
 	  	if (!move_uploaded_file($_FILES['featured_image']['tmp_name'], $target)) {
 	  		array_push($errors, "Error al cargar imagen. Compruebe la configuración de archivos de su servidor");
 	  	}
-		// Ensure that no post is saved twice. 
+		// Asegúrese de que ninguna publicación se guarde dos veces.
 		$post_check_query = "SELECT * FROM posts WHERE slug='$post_slug' LIMIT 1";
 		$result = mysqli_query($conn, $post_check_query);
 
 		if (mysqli_num_rows($result) > 0) { // if post exists
 			array_push($errors, "Ya existe un artículo con ese nombre.");
 		}
-		// create post if there are no errors in the form
+		// crear publicación si no hay errores en el formulario
 		if (count($errors) == 0) {
 			
 			$query = "INSERT INTO posts (user_id, title, slug, image, body, published, created_at, updated_at) VALUES('$user_id', '$title', '$post_slug', '$featured_image', '$body', $published, now(), now())";
@@ -125,9 +125,9 @@ function createPost($request_values)
 	}
 
 	/* * * * * * * * * * * * * * * * * * * * *
-	* - Takes post id as parameter
-	* - Fetches the post from database
-	* - sets post fields on form for editing
+	* - Toma la identificación de la publicación como parámetro
+	* - Obtiene la publicación de la base de datos
+	* - establece campos de publicación en el formulario para editar
 	* * * * * * * * * * * * * * * * * * * * * */
 	function editPost($role_id)
 	{
@@ -135,7 +135,7 @@ function createPost($request_values)
 		$sql = "SELECT * FROM posts WHERE id=$role_id LIMIT 1";
 		$result = mysqli_query($conn, $sql);
 		$post = mysqli_fetch_assoc($result);
-		// set form values on the form to be updated
+		// establecer valores de formulario en el formulario que se actualizará
 		$title = $post['title'];
 		$body = $post['body'];
 		$published = $post['published'];
@@ -151,30 +151,30 @@ function createPost($request_values)
 		if (isset($request_values['topic_id'])) {
 			$topic_id = esc($request_values['topic_id']);
 		}
-		// create slug: if title is "The Storm Is Over", return "the-storm-is-over" as slug
+		// crear babosa: si el título es "La tormenta ha terminado", devuelve "la-tormenta-terminó"
 		$post_slug = makeSlug($title);
 
 		if (empty($title)) { array_push($errors, "Título del artículo"); }
 		if (empty($body)) { array_push($errors, "Cuerpo del artículo"); }
-		// if new featured image has been provided
+		// si se ha proporcionado una nueva imagen destacada
 		$featured_image = $_FILES['featured_image']['name'];
 		if (isset($_POST['featured_image'])) {
-			// Get image name
-		  	// image file directory
+			// Obtener el nombre de la imagen
+		  	// directorio de archivos de imagen
 		  	$target = "../static/images/" . basename($featured_image);
 		  	if (!move_uploaded_file($_FILES['featured_image']['tmp_name'], $target)) {
 		  		array_push($errors, "Error al cargar imagen. Compruebe la configuración de archivos de su servidor");
 		  	}
 		}
 
-		// register topic if there are no errors in the form
+		// registrar tema si no hay errores en el formulario
 		if (count($errors) == 0) {
 			$query = "UPDATE posts SET title='$title', slug='$post_slug', views=0, image='$featured_image', body='$body', published=$published, updated_at=now() WHERE id=$post_id";
-			// attach topic to post on post_topic table
+			// adjuntar tema para publicar en la tabla post_topic
 			if(mysqli_query($conn, $query)){ // if post created successfully
 				if (isset($topic_id)) {
 					$inserted_post_id = mysqli_insert_id($conn);
-					// create relationship between post and topic
+					// crear una relación entre la publicación y el tema
 					$sql = "INSERT INTO post_topic (post_id, topic_id) VALUES($inserted_post_id, $topic_id)";
 					mysqli_query($conn, $sql);
 					$_SESSION['message'] = "Artículo creado";
@@ -187,7 +187,7 @@ function createPost($request_values)
 			exit(0);
 		}
 	}
-	// delete blog post
+	// eliminar publicación de blog
 	function deletePost($post_id)
 	{
 		global $conn;
@@ -198,7 +198,7 @@ function createPost($request_values)
 			exit(0);
 		}
     }
-    // if user clicks the publish post button
+    // si el usuario hace clic en el botón publicar publicación
 if (isset($_GET['publish']) || isset($_GET['unpublish'])) {
 	$message = "";
 	if (isset($_GET['publish'])) {
@@ -210,7 +210,7 @@ if (isset($_GET['publish']) || isset($_GET['unpublish'])) {
 	}
 	togglePublishPost($post_id, $message);
 }
-// delete blog post
+// eliminar publicación de blog
 function togglePublishPost($post_id, $message)
 {
 	global $conn;
